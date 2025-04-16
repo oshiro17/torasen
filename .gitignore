@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+
+# Environment files
+.env
+/config/master.key
+
+# Docker
+docker-compose.override.yml
+
+# Node.js
+/frontend/node_modules/
+/npm-debug.log*
+
+# Rails
+/backend/vendor/bundle/
+/backend/.bundle/
+/log/
+/tmp/
+
+# Database dumps
+*.sqlite3
+*.sql
+
+# Editor settings
+.idea/
+/.vscode/
