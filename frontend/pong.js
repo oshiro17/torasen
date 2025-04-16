@@ -121,10 +121,10 @@ document.getElementById('start').addEventListener('click', () => {
 // キー操作
 document.addEventListener('keydown', e => {
   switch (e.key.toLowerCase()) {
-    case 'arrowup':    paddle1.dy = -5; break;
-    case 'arrowdown':  paddle1.dy = +5; break;
-    case 'w':          paddle2.dy = -5; break;
-    case 's':          paddle2.dy = +5; break;
+    case 'arrowup':    paddle2.dy = -5; break;
+    case 'arrowdown':  paddle2.dy = +5; break;
+    case 'w':          paddle1.dy = -5; break;
+    case 's':          paddle1.dy = +5; break;
   }
 });
 document.addEventListener('keyup', e => {
