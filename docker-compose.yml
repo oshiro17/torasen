@@ -1,13 +1,13 @@
-# version: '3.8'
+version: '3.8'
 
 services:
   db:
     image: postgres:15-alpine
     platform: linux/arm64
     environment:
-      POSTGRES_USER: dev
+      POSTGRES_USER:    dev
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: dev_db
+      POSTGRES_DB:      dev_db
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
@@ -22,8 +22,22 @@ services:
       - ./backend:/app
     ports:
       - "3000:3000"
+    environment:
+      # database.yml でこれら ENV を使うようにしておく
+      DATABASE_HOST:     db
+      DATABASE_USERNAME: dev
+      DATABASE_PASSWORD: password
+      DATABASE_NAME:     dev_db
+      RAILS_ENV:         development
     depends_on:
       - db
+    # サーバ起動前にPID削除＋DB作成・マイグレーション＋Webサーバ起動
+    command: >
+      bash -lc "
+        rm -f tmp/pids/server.pid &&
+        bundle exec rails db:create db:migrate &&
+        bundle exec rails s -b 0.0.0.0
+      "
 
   frontend:
     build:

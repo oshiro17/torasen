@@ -1,21 +1,17 @@
 const canvas = document.getElementById('game');
 const ctx    = canvas.getContext('2d');
-
 // パドル・ボールの初期設定
 const paddle1 = { x:10,              y:canvas.height/2 - 50, w:10, h:100, dy:0 };
 const paddle2 = { x:canvas.width-20, y:canvas.height/2 - 50, w:10, h:100, dy:0 };
 const ball    = { x:canvas.width/2,  y:canvas.height/2,      r:8,  dx:4, dy:4 };
-
 // DOM 要素キャッシュ
 const leftScoreEl  = document.getElementById('left-score');
 const rightScoreEl = document.getElementById('right-score');
 const resultEl     = document.getElementById('result');
-
 // スコアとゲーム状態
 let leftScore  = 0;
 let rightScore = 0;
 let isGameOver = false;
-
 // スコア表示更新
 function updateScoreDisplay() {
   leftScoreEl.textContent  = leftScore;
