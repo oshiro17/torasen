@@ -1,56 +1,33 @@
 version: '3.8'
 
 services:
-  db:
-    image: postgres:15-alpine
-    platform: linux/arm64
-    environment:
-      POSTGRES_USER:    dev
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB:      dev_db
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    platform: linux/arm64
-    volumes:
-      - ./backend:/app
+    build: ./backend
     ports:
       - "3000:3000"
-    environment:
-      # database.yml でこれら ENV を使うようにしておく
-      DATABASE_HOST:     db
-      DATABASE_USERNAME: dev
-      DATABASE_PASSWORD: password
-      DATABASE_NAME:     dev_db
-      RAILS_ENV:         development
     depends_on:
       - db
-    # サーバ起動前にPID削除＋DB作成・マイグレーション＋Webサーバ起動
-    command: >
-      bash -lc "
-        rm -f tmp/pids/server.pid &&
-        bundle exec rails db:create db:migrate &&
-        bundle exec rails s -b 0.0.0.0
-      "
+    environment:
+      - PORT=${PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - DB_PORT=${DB_PORT}
+    env_file:
+      - .env
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    platform: linux/arm64
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
-      - "3001:3000"
-    depends_on:
-      - backend
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/migrations.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
-  pgdata:
+  postgres_data:

@@ -1,0 +1,14 @@
+/* frontend/style.css */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #000;
+    margin: 0;
+  }
+  
+  canvas {
+    background: #222;
+    border: 2px solid #fff;
+  }

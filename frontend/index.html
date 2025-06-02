@@ -1,15 +1,22 @@
-<!-- frontend/index.html -->
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>My Pong SPA</title>
-  <!-- style.css は main.js 内で import していれば自動で読み込まれます -->
+  <meta charset="UTF-8">
+  <title>Pong Game</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="app"></div>
+  <h2>Register</h2>
+  <input id="reg-username" placeholder="Username">
+  <input id="reg-password" type="password" placeholder="Password">
+  <button type="button" onclick="register()">Register</button>
+  
+  <h2>Login</h2>
+  <input id="login-username" placeholder="Username">
+  <input id="login-password" type="password" placeholder="Password">
+  <button type="button" onclick="login()">Login</button>
 
-  <!-- ソースのエントリポイントをそのまま指定 -->
-  <script type="module" src="/src/main.js"></script>
+  <canvas id="pong" width="800" height="500"></canvas>
+  <script src="main.js"></script>
 </body>
 </html>
