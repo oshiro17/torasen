@@ -124,7 +124,7 @@ function gameLoop() {
 async function register() {
     const username = document.getElementById("reg-username").value;
     const password = document.getElementById("reg-password").value;
-    const res = await fetch("http://localhost:3000/register", {
+    const res = await fetch("https://localhost:3000/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
@@ -154,7 +154,7 @@ async function login() {
     const password = document.getElementById("login-password").value;
     
     try {
-      const res = await fetch("http://localhost:3000/login", {
+      const res = await fetch("https://localhost:3000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
