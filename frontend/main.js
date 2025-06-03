@@ -132,17 +132,46 @@ async function register() {
     alert(await res.text());
   }
   
-  async function login() {
-    const username = document.getElementById("login-username").value;
-    const password = document.getElementById("login-password").value;
-    const res = await fetch("http://localhost:3000/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-      credentials: "include", // セッション維持
-    });
-    alert(await res.text());
+
+function isLoggedIn() {
+  return !!localStorage.getItem("loggedIn");
+}
+
+window.onload = () => {
+  if (!isLoggedIn()) {
+    canvas.style.display = "none";
+  } else {
+    canvas.style.display = "block";
+    setInterval(gameLoop, 1000 / 60);
   }
+};
 
 movePaddles();
-setInterval(gameLoop, 1000 / 60);
+// setInterval(gameLoop, 1000 / 60);
+async function login() {
+    console.log("login() 呼ばれた！");
+    const username = document.getElementById("login-username").value;
+    const password = document.getElementById("login-password").value;
+    
+    try {
+      const res = await fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+        credentials: "include",
+      });
+  
+      const text = await res.text();
+      console.log("ログイン応答:", text);
+      alert(text);
+  
+      if (res.ok) {
+        localStorage.setItem("loggedIn", "true");
+        canvas.style.display = "block";
+        setInterval(gameLoop, 1000 / 60);
+      }
+  
+    } catch (err) {
+      console.error("ログインエラー:", err);
+    }
+  }
