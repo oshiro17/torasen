@@ -1,22 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>Pong Game</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Torasen Pong</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h2>Register</h2>
-  <input id="reg-username" placeholder="Username">
-  <input id="reg-password" type="password" placeholder="Password">
-  <button type="button" onclick="register()">Register</button>
-  
-  <h2>Login</h2>
-  <input id="login-username" placeholder="Username">
-  <input id="login-password" type="password" placeholder="Password">
-  <button type="button" onclick="login()">Login</button>
-
-  <canvas id="pong" width="800" height="500" style="display:none;"></canvas>
-  <script src="main.js"></script>
+  <div id="root"></div>
+  <!-- ルーターをモジュールとして読み込む -->
+  <script type="module" src="router.js"></script>
 </body>
 </html>

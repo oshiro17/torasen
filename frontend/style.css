@@ -1,14 +1,9 @@
-/* frontend/style.css */
 body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: #000;
-    margin: 0;
-  }
-  
-  canvas {
-    background: #222;
-    border: 2px solid #fff;
-  }
+  font-family: sans-serif;
+  background: #111;
+  color: #eee;
+  text-align: center;
+  margin: 0;
+}
+canvas { background:#222; display:block; margin:20px auto; }
+input,button { margin:4px; padding:4px 8px; }

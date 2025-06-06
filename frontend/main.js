@@ -1,10 +1,14 @@
-// frontend/main.js
-
-const canvas = document.getElementById("pong");
+// frontend/main.js  — Pong engine (exported for GameView)
+const canvas = document.createElement("canvas");
+canvas.id = "pong";
+canvas.width = 800;
+canvas.height = 500;
 const ctx = canvas.getContext("2d");
 
-const paddleWidth = 10, paddleHeight = 100;
-const ballRadius = 8;
+/* ---------- Game State ---------- */
+const paddleWidth = 10,
+      paddleHeight = 100,
+      ballRadius = 8;
 
 const player = {
   x: 0,
@@ -12,7 +16,7 @@ const player = {
   width: paddleWidth,
   height: paddleHeight,
   color: "white",
-  score: 0,
+  score: 0
 };
 
 const opponent = {
@@ -21,88 +25,77 @@ const opponent = {
   width: paddleWidth,
   height: paddleHeight,
   color: "white",
-  score: 0,
+  score: 0
 };
 
 const ball = {
   x: canvas.width / 2,
   y: canvas.height / 2,
   radius: ballRadius,
-  speed: 5,
-  dx: 5,
-  dy: 5,
-  color: "white",
+  dx: 6,
+  dy: 6,
+  color: "white"
 };
 
-function drawRect(x, y, w, h, color) {
-  ctx.fillStyle = color;
+/* ---------- Drawing Helpers ---------- */
+function drawRect(x, y, w, h, c) {
+  ctx.fillStyle = c;
   ctx.fillRect(x, y, w, h);
 }
 
-function drawArc(x, y, r, color) {
-  ctx.fillStyle = color;
+function drawArc(x, y, r, c) {
+  ctx.fillStyle = c;
   ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2, true);
+  ctx.arc(x, y, r, 0, Math.PI * 2);
   ctx.closePath();
   ctx.fill();
-}
-
-function resetBall() {
-  ball.x = canvas.width / 2;
-  ball.y = canvas.height / 2;
-  ball.dx *= -1;
-  ball.dy = 5 * (Math.random() > 0.5 ? 1 : -1);
 }
 
 function drawScore() {
   ctx.fillStyle = "white";
   ctx.font = "32px Arial";
-  ctx.fillText(player.score, canvas.width / 4, 50);
-  ctx.fillText(opponent.score, 3 * canvas.width / 4, 50);
+  ctx.fillText(player.score, canvas.width / 4, 40);
+  ctx.fillText(opponent.score, (3 * canvas.width) / 4, 40);
 }
 
-function movePaddles() {
-  document.addEventListener("keydown", (e) => {
-    // W/S for player
-    if (e.key === "w" && player.y > 0) player.y -= 20;
-    if (e.key === "s" && player.y + player.height < canvas.height) player.y += 20;
-
-    // ↑/↓ for opponent
-    if (e.key === "ArrowUp" && opponent.y > 0) opponent.y -= 20;
-    if (e.key === "ArrowDown" && opponent.y + opponent.height < canvas.height) opponent.y += 20;
-  });
+/* ---------- Mechanics ---------- */
+function resetBall() {
+  ball.x = canvas.width / 2;
+  ball.y = canvas.height / 2;
+  ball.dx *= -1; // 方向反転
+  ball.dy = 6 * (Math.random() > 0.5 ? 1 : -1);
 }
 
-function detectCollision(ball, paddle) {
+function detectCollision(b, p) {
   return (
-    ball.x - ball.radius < paddle.x + paddle.width &&
-    ball.x + ball.radius > paddle.x &&
-    ball.y < paddle.y + paddle.height &&
-    ball.y > paddle.y
+    b.x - b.radius < p.x + p.width &&
+    b.x + b.radius > p.x &&
+    b.y - b.radius < p.y + p.height &&
+    b.y + b.radius > p.y
   );
 }
 
 function update() {
+  // move ball
   ball.x += ball.dx;
   ball.y += ball.dy;
 
-  // Wall collision
+  // top / bottom wall
   if (ball.y + ball.radius > canvas.height || ball.y - ball.radius < 0) {
     ball.dy *= -1;
   }
 
-  // Paddle collision
-  let currentPlayer = ball.x < canvas.width / 2 ? player : opponent;
-  if (detectCollision(ball, currentPlayer)) {
+  // paddle collision
+  const target = ball.x < canvas.width / 2 ? player : opponent;
+  if (detectCollision(ball, target)) {
     ball.dx *= -1;
   }
 
-  // Score
+  // score check
   if (ball.x - ball.radius < 0) {
     opponent.score++;
     resetBall();
   }
-
   if (ball.x + ball.radius > canvas.width) {
     player.score++;
     resetBall();
@@ -110,68 +103,51 @@ function update() {
 }
 
 function render() {
-  drawRect(0, 0, canvas.width, canvas.height, "#222");
+  drawRect(0, 0, canvas.width, canvas.height, "#222"); // background
   drawRect(player.x, player.y, player.width, player.height, player.color);
   drawRect(opponent.x, opponent.y, opponent.width, opponent.height, opponent.color);
   drawArc(ball.x, ball.y, ball.radius, ball.color);
   drawScore();
 }
 
-function gameLoop() {
-  update();
-  render();
-}
-async function register() {
-    const username = document.getElementById("reg-username").value;
-    const password = document.getElementById("reg-password").value;
-    const res = await fetch("https://localhost:3000/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
-    alert(await res.text());
-  }
-  
-
-function isLoggedIn() {
-  return !!localStorage.getItem("loggedIn");
-}
-
-window.onload = () => {
-  if (!isLoggedIn()) {
-    canvas.style.display = "none";
-  } else {
-    canvas.style.display = "block";
-    setInterval(gameLoop, 1000 / 60);
-  }
-};
-
-movePaddles();
-// setInterval(gameLoop, 1000 / 60);
-async function login() {
-    console.log("login() 呼ばれた！");
-    const username = document.getElementById("login-username").value;
-    const password = document.getElementById("login-password").value;
-    
-    try {
-      const res = await fetch("https://localhost:3000/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-        credentials: "include",
-      });
-  
-      const text = await res.text();
-      console.log("ログイン応答:", text);
-      alert(text);
-  
-      if (res.ok) {
-        localStorage.setItem("loggedIn", "true");
-        canvas.style.display = "block";
-        setInterval(gameLoop, 1000 / 60);
-      }
-  
-    } catch (err) {
-      console.error("ログインエラー:", err);
+/* ---------- Controls ---------- */
+let controlsBound = false;
+function bindControls() {
+  if (controlsBound) return;
+  controlsBound = true;
+  document.addEventListener("keydown", (e) => {
+    switch (e.key) {
+      case "w":
+        if (player.y > 0) player.y -= 22;
+        break;
+      case "s":
+        if (player.y + player.height < canvas.height) player.y += 22;
+        break;
+      case "ArrowUp":
+        if (opponent.y > 0) opponent.y -= 22;
+        break;
+      case "ArrowDown":
+        if (opponent.y + opponent.height < canvas.height) opponent.y += 22;
+        break;
     }
-  }
+  });
+}
+
+/* ---------- Game Loop Control ---------- */
+let rafId = null;
+export function startGame() {
+  bindControls();
+  cancelAnimationFrame(rafId);
+  const loop = () => {
+    update();
+    render();
+    rafId = requestAnimationFrame(loop);
+  };
+  loop();
+}
+
+export function stopGame() {
+  if (rafId) cancelAnimationFrame(rafId);
+}
+
+export { canvas };

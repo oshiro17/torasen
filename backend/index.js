@@ -6,6 +6,7 @@ const cors     = require("cors");
 const https    = require("https");
 const helmet = require("helmet");
 const fs       = require("fs");
+const path     = require("path");
 require("dotenv").config();
 
 const app  = express();
@@ -15,18 +16,13 @@ app.use(helmet());
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// trust first proxy (e.g. when running behind nginx / Docker)
+app.set("trust proxy", 1);
 
-// app.use(session({
-//   secret: process.env.SESSION_SECRET || "dev-secret",
-//   resave: false,
-//   saveUninitialized: false,   // 推奨
-//   cookie: {
-//     secure: true,             // ← https 前提
-//     httpOnly: true,
-//     sameSite: "lax",
-//     maxAge: 1000 * 60 * 60    // 1h
-//   }
-// }));
+// ---------- serve frontend as static files ----------
+const frontendPath = path.join(__dirname, "frontend");
+app.use(express.static(frontendPath));
+
 const secret = process.env.SESSION_SECRET;
 if (!secret) {
   console.error("SESSION_SECRET is not set in .env!");
@@ -93,6 +89,15 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// ---------- SPA fallback: always return index.html ----------
+// app.get("/*", (req, res) => {
+//   res.sendFile(path.join(frontendPath, "index.html"));
+// });
+// 変更前：この行を探す
+// 変更後：必ず「/*」にすること
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
+});
 /* ----- HTTPS サーバー ----- */
 const server = https.createServer(
   {
