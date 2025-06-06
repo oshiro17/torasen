@@ -4,29 +4,46 @@ const session  = require("express-session");
 const pool     = require("./db");
 const cors     = require("cors");
 const https    = require("https");
+const helmet = require("helmet");
 const fs       = require("fs");
 require("dotenv").config();
 
 const app  = express();
 const port = process.env.PORT || 3000;
+app.use(helmet());
 
-/* ----- ミドルウェア ----- */
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// app.use(session({
+//   secret: process.env.SESSION_SECRET || "dev-secret",
+//   resave: false,
+//   saveUninitialized: false,   // 推奨
+//   cookie: {
+//     secure: true,             // ← https 前提
+//     httpOnly: true,
+//     sameSite: "lax",
+//     maxAge: 1000 * 60 * 60    // 1h
+//   }
+// }));
+const secret = process.env.SESSION_SECRET;
+if (!secret) {
+  console.error("SESSION_SECRET is not set in .env!");
+  process.exit(1);        // 起動を止める
+}
+
 app.use(session({
-  secret: process.env.SESSION_SECRET || "dev-secret",
+  secret,
   resave: false,
-  saveUninitialized: false,   // 推奨
+  saveUninitialized: false,
   cookie: {
-    secure: true,             // ← https 前提
+    secure: true,
     httpOnly: true,
     sameSite: "lax",
-    maxAge: 1000 * 60 * 60    // 1h
+    maxAge: 1000 * 60 * 60
   }
 }));
-
 /* ----- バリデーション関数 ----- */
 function isValidInput(str) {
   return typeof str === "string" && str.length >= 3 && !/[<>"'`;]/.test(str);
